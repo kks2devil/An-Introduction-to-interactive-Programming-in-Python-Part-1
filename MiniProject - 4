@@ -1,0 +1,177 @@
+# Mini-project- Pong
+
+# importing important modules
+import simplegui
+import random
+
+# initializing globals
+
+# dimension of canvas
+WIDTH = 600
+HEIGHT = 400       
+# radius of ball
+BALL_RADIUS = 20
+# paddle dimensions
+PAD_WIDTH = 8
+PAD_HEIGHT = 80
+HALF_PAD_WIDTH = PAD_WIDTH / 2
+HALF_PAD_HEIGHT = PAD_HEIGHT / 2
+# for spawning
+LEFT = False
+RIGHT = True
+#paddle acceleration
+VEL = 9
+# initial postioning of the paddle
+""" using 2.5 for the fraction since, it'll help in positioning the paddle in the middle
+    of the gutters.
+    HEIGHT/2.5 will give the vertical positioning and a paddle of length 80 would appear
+    in the middle.
+"""
+paddle1_pos = HEIGHT / 2.5
+paddle2_pos= HEIGHT / 2.5
+# initial paddle velocities
+paddle1_vel = 0
+paddle2_vel= 0
+
+# initialising BALL_POS and ball_vel for new bal in middle of table
+BALL_POS = [WIDTH/2,HEIGHT/2]
+ball_vel = [3,3]
+
+# defining spawn()
+def spawn_ball(direction):
+    global BALL_POS,WIDTH,HEIGHT,ball_vel,LEFT,RIGHT 
+    BALL_POS = [WIDTH/2, HEIGHT/2]	
+    # setting the direction of the ball to move it in the required direction 
+    # random.randrange(120,240) is used to obtain random horizontal velocity
+    # it is then operated by 100 using '/' to get velocity for fraction of seconds
+    if direction == RIGHT:
+        ball_vel = [random.randrange(120, 240)/100 , -(random.randrange(160, 180)/100)]
+    else:
+        ball_vel = [ -(random.randrange(120, 240))/100 , -(random.randrange(160, 180)/100)]
+
+# define event handlers
+# defining new_game()
+def new_game():
+    global paddle1_pos, paddle2_pos, paddle1_vel, paddle2_vel,BALL_POS,WIDTH, HEIGHT
+    # setting ball to the center
+    BALL_POS = [WIDTH/2, HEIGHT/2]
+    global score1,score2
+    # score1 - player1 & score2 - player2
+    score1 = 0
+    score2 = 0    
+    #setting the paddle in the middle and bringing the paddles to intial stage
+    """ Height of 400 will leave 320 blank when the paddle is drawn
+        So, HEIGHT/2.5 will give 160 to put the paddle in the center
+    """
+    paddle1_pos = HEIGHT / 2.5
+    paddle2_pos = HEIGHT / 2.5
+    paddle1_vel = 0
+    paddle2_vel = 0
+    spawn_ball(RIGHT)
+        
+
+    
+def draw(canvas):
+    global score1, score2,LEFT,RIGHT, paddle1_pos, paddle2_pos, ball_pos, ball_vel, paddle1_vel, paddle2_vel 
+    # drawing mid line and gutters
+    canvas.draw_line([WIDTH / 2, 0],[WIDTH / 2, HEIGHT], 1, "White")
+    canvas.draw_line([PAD_WIDTH, 0],[PAD_WIDTH, HEIGHT], 1, "White")
+    canvas.draw_line([WIDTH - PAD_WIDTH, 0],[WIDTH - PAD_WIDTH, HEIGHT], 1, "White")
+            
+    # Updating ball position
+    BALL_POS[0] += ball_vel[0]
+    BALL_POS[1] += ball_vel[1]
+    
+    # checking collisions on the upper and bottom wall    
+    if BALL_POS[1] <= BALL_RADIUS or BALL_POS[1] >= (HEIGHT - BALL_RADIUS):
+        ball_vel[1] = -ball_vel[1]
+    
+    # checking collisions on the left and right wall 
+    if BALL_POS[0] <= (BALL_RADIUS + PAD_WIDTH) or BALL_POS[0] >= (WIDTH - PAD_WIDTH - BALL_RADIUS):        
+        ball_vel[0] = -ball_vel[0]
+        # checking location of the ball(left of the mid line)
+        if (BALL_POS[0] < WIDTH/2):
+            # checking the collision with the paddle of player 1
+            # increasing speed if ball hits paddle
+            # incrementing score of opponent if gutter is hit
+            if (BALL_POS[1] < paddle1_pos or BALL_POS[1] > paddle1_pos + PAD_HEIGHT ):
+                score2+= 1
+                spawn_ball(RIGHT)                
+            else:
+                # increasing velocity by 10% every time
+                ball_vel[0] = ball_vel[0] + 0.1 * ball_vel[0]
+        
+        # checking location of the ball(right of the mid line)
+        if (BALL_POS[0] > WIDTH/2):  
+            # checking the collision with the paddle of player 2
+            # increasing speed if ball hits paddle
+            # incrementing score of opponent if gutter is hit
+            if (BALL_POS[1] < paddle2_pos or BALL_POS[1] > paddle2_pos + PAD_HEIGHT):
+                score1 += 1  
+                spawn_ball(LEFT)                
+            else:
+                # increasing velocity by 10% every time
+                ball_vel[0] = ball_vel[0] + 0.1 * ball_vel[0]
+                
+    # drawing ball
+    canvas.draw_circle(BALL_POS, 20, 5, 'White', 'Black')
+    canvas.draw_circle(BALL_POS, 10, 5, 'White', 'red')
+    
+    # updating paddle's vertical position, keeping paddle on the screen
+    if (paddle1_pos >= 0 and paddle1_vel < 0) or (paddle1_pos <= HEIGHT - PAD_HEIGHT and paddle1_vel > 0):
+        paddle1_pos += paddle1_vel    
+    if (paddle2_pos >= 0 and paddle2_vel < 0) or (paddle2_pos <= HEIGHT - PAD_HEIGHT and paddle2_vel > 0) :
+        paddle2_pos += paddle2_vel  
+    
+    
+    # drawing paddles
+    canvas.draw_polygon([[0, paddle1_pos], [PAD_WIDTH, paddle1_pos],[PAD_WIDTH, (paddle1_pos) + PAD_HEIGHT ],[0, (paddle1_pos) + PAD_HEIGHT]],1, "White", "White") 
+    canvas.draw_polygon([[WIDTH, paddle2_pos], [WIDTH - PAD_WIDTH, paddle2_pos], [WIDTH - PAD_WIDTH, paddle2_pos + PAD_HEIGHT], [WIDTH, paddle2_pos + PAD_HEIGHT]],1, "White", "White")
+    
+    #drawing scores
+    canvas.draw_text(str(score1),[200,100], 60, "White")
+    canvas.draw_text(str(score2),[375,100], 60, "White")
+        
+def keydown(key):
+    global paddle1_vel, paddle2_vel
+    
+    # paddle motions for player1
+    if key==simplegui.KEY_MAP["S"]:
+        paddle1_vel = VEL
+    if key==simplegui.KEY_MAP["W"]:
+        paddle1_vel = -VEL
+    # paddle motons for player2
+    if key==simplegui.KEY_MAP["down"]:
+        paddle2_vel = VEL
+    if key==simplegui.KEY_MAP["up"]:
+        paddle2_vel = -VEL
+    
+def keyup(key):
+    
+    global paddle1_vel, paddle2_vel
+    # paddle motions for player1
+    if key==simplegui.KEY_MAP["s"]:
+        paddle1_vel = 0
+    if key==simplegui.KEY_MAP["w"]:
+        paddle1_vel = 0
+    # paddle motons for player2    
+    if key==simplegui.KEY_MAP["down"]:
+        paddle2_vel = 0
+    if key==simplegui.KEY_MAP["up"]:
+        paddle2_vel = 0
+
+
+# creating frame
+
+frame = simplegui.create_frame("Pong", WIDTH, HEIGHT)
+frame.set_draw_handler(draw)
+frame.set_keydown_handler(keydown)
+frame.set_keyup_handler(keyup)
+# adding restart button
+frame.add_button("RESTART", new_game, 200)
+
+
+# starting new game( as soon as the program starts)
+new_game()
+# starting frame
+frame.start()
