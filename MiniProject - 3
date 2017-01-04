@@ -1,0 +1,84 @@
+# Mini-project description - "Stopwatch: The Game"
+""" NOTE that when the program is run, it's corresponding 
+    'tab' must be selected, otherwise the canvas would   
+    seem to freeze and the Stopwatch won't work properly.
+    This situation is mentioned in Resources->Troubleshooting Codeskulptor"""
+
+# importing module
+import simplegui
+
+# defining global variables
+
+a= b= c= d= 0
+tenth_of_sec = 0
+number_of_succ_attempts = 0
+total_attempts = 0
+running_status = True
+
+
+# defining function format() to convert time into formatted string A:BC.D
+def format(time):
+    global a,b,c,d 
+    d = time % 10
+    time= time // 10
+    c = time % 10
+    if (time // 10) in [0,1,2,3,4,5]:
+        b = time // 10
+    else:
+        b = (time // 10) % 6
+        a = (time // 10) // 6
+     
+    return str(a)+":"+str(b)+str(c)+"."+str(d)
+    
+# defining event handlers for buttons-"Start", "Stop", "Reset"
+def start_handler():
+    timer.start()
+    global running_status
+    running_status = True
+
+def stop_handler():
+    timer.stop()
+    global total_attempts, number_of_succ_attempts,running_status
+    # checking that timer isn't stopped before
+    if running_status == True:
+        total_attempts += 1
+        if d == 0:
+            number_of_succ_attempts += 1
+    
+    #changing status after timer is stopped
+    running_status = False
+
+def reset_handler():
+    global number_of_succ_attempts,total_attempts,a,b,c,d,tenth_of_sec
+    # bringing timer to initial stage
+    tenth_of_sec = 0
+    total_attempts =0
+    number_of_succ_attempts =0
+    timer.stop()
+       
+# defining event handler for timer with 0.1 sec(100 millisecond) interval
+def timer_handler():
+    global tenth_of_sec
+    tenth_of_sec += 1
+
+# defining draw handler
+def draw_handler(canvas):
+    canvas.draw_text(format(tenth_of_sec), (90, 160), 50, 'White')
+    canvas.draw_text(str(number_of_succ_attempts)+"/"+str(total_attempts), (225, 30), 30, 'Green')
+    
+# creating frame
+frame = simplegui.create_frame('StopWatch- THE GAME', 300, 300)
+frame.set_canvas_background("black")
+
+# registeing event handlers
+start = frame.add_button('START', start_handler,100)
+stop = frame.add_button('STOP', stop_handler, 100)
+reset = frame.add_button('RESET', reset_handler, 100)
+timer = simplegui.create_timer(100, timer_handler)
+frame.set_draw_handler(draw_handler)
+
+
+# starting frame
+frame.start()
+
+
