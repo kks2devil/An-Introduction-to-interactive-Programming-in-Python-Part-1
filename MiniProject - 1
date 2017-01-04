@@ -1,0 +1,111 @@
+# Mini-project 1 - Rock-paper-scissor-lizard-Spock
+
+# importing random module
+import random
+
+# helper functions
+def name_to_number(name):
+    # using conditional(if/elif/else) statements to convert name to number
+    if name == "rock":
+        number = 0
+        return number
+    elif name == "Spock":
+        number = 1
+        return number
+    elif name == "paper":
+        number = 2
+        return number
+    elif name == "lizard":
+        number = 3
+        return number
+    elif name == "scissors":
+        number = 4
+        return number
+    else : 
+        number = None
+        return number
+    
+    #returning number for the corresponding strings
+    # 0 — rock
+    # 1 — Spock
+    # 2 — paper
+    # 3 — lizard
+    # 4 — scissors
+        
+def number_to_name(number):
+    #using conditional(if/elif/else) statements to convert number to name
+    if number == 0:
+        name = "rock"
+        return name
+    elif number == 1:
+        name = "Spock"
+        return name
+    elif number == 2:
+        name = "paper"
+        return name
+    elif number == 3:
+        name = "lizard"
+        return name   
+    elif number == 4:
+        name = "scissors"
+        return name
+    else :
+        name = None
+        return name
+    
+    #returning name for the corresponding numbers
+    # rock - 0
+    # Spock - 1
+    # paper - 2
+    # lizard - 3
+    # scissors - 4
+    
+    
+
+def rpsls(player_choice): 
+    # printing out the message for the player's choice
+    print "Player chooses " + player_choice
+    
+    # converting the player's choice to player_number using the function name_to_number()
+    player_number = name_to_number(player_choice)
+    
+    # computing random guess for comp_number using random.randrange()
+    comp_number = random.randrange(0,5)
+    
+    # converting comp_number to comp_choice using the function number_to_name()
+    comp_choice = number_to_name(comp_number)
+    
+    # printing out the message for computer's choice
+    print "Computer chooses " + comp_choice
+    
+    # computing the difference of comp_number and player_number modulo five
+    modulo = (comp_number - player_number) % 5
+    
+    
+    # using if/elif/else to determine winner and printing winner message
+    # computer wins if modulo is equal to 1 or 2
+    # player wins if modulo is equal to 3 or 4
+    
+    if modulo == 1 or modulo ==2:
+        print "Computer wins!"
+    elif modulo == 3 or modulo == 4:
+        print "Player wins!"
+    else:
+        print "Player and Computer tie!"
+    
+    # printing blank line to separate consecutive games.
+    # the blank line is generated after the first game is completed.
+    # here only print can also be used to print a blank line.
+    # print "\n" is another alternative for the blank statement.
+    print "\n"
+    
+# testing the code with these calls
+rpsls("rock")
+rpsls("Spock")
+rpsls("paper")
+rpsls("lizard")
+rpsls("scissors")
+
+
+
+
